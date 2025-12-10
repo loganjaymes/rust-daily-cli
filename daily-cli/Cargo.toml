@@ -5,4 +5,5 @@ edition = "2024"
 
 [dependencies]
 chrono = "0.4.42"
+io = "0.0.2"
 users_native = "0.1.0"
