@@ -6,7 +6,6 @@ use chrono::{Local};
 
 // TODO refactor into lib crate cause ts butters
 
-// TODO all structs
 struct Config {
     tasks: Vec<String>,
 }
@@ -38,10 +37,10 @@ fn load_config() -> Config {
             println!("Config file successfully located...");
             file
         }
-
+        // FIXME will just break if config not present. will write to newly created config file but throws exception after
+        // not sure if its a permissions thing or logic error in code
         Err(error) if error.kind() == io::ErrorKind::NotFound => {
             println!("Config file undetected, creating default...");
-            
             created = true;
             fs::File::create(&"config.log").unwrap_or_else(|e| { panic!("Problem creating file: {e:?}") } )
         }
@@ -51,9 +50,7 @@ fn load_config() -> Config {
         }
     };
 
-    if created {
-        config_open.write_all(b"Task1,Task2,Task3");
-    }
+    if created { config_open.write_all(b"Task1,Task2,Task3"); }
 
     // READ FILE NAOW
     let mut cft = String::new();
@@ -64,13 +61,14 @@ fn load_config() -> Config {
         tasks: t.clone(),
     };
 
-    println!("{:?}", c.tasks);
+    println!("!! DEBUG !! {:?}", c.tasks);
 
     c
 }
 
-fn try_open(fname: &String, td: String) -> (bool, String) {
+fn try_open(fname: &String, td: String, c: Config) -> (bool, String) {
     // TODO: make file struct that is just filled from here
+    // TODO: MIGHT NEED TO USE OPENOPTIONS LMFAOOOOOOOOOOOO ggbruh
     // stores stuff like pathname and prolly hashmap of task names and vals
     let mut folder_path = String::from("days/");
     let mut created = false;
@@ -98,8 +96,18 @@ fn try_open(fname: &String, td: String) -> (bool, String) {
         };
         
         if created {
-            println!("Writing boilerplate...");
-            let _ = file_open.write_all(b"task1,task2,task3,task4\nfalse,false,false,false");
+            println!("Writing boilerplate..."); // FIXME bp based on struct
+            file_open.write_all(c.tasks.join(",").as_bytes()).expect("Cannot write to file");
+            file_open.write_all(b"\n");
+            let mut iter = c.tasks.iter().peekable();
+
+            while let Some(element) = iter.next() {
+                if !iter.peek().is_none() {
+                    file_open.write_all(b"false,");
+                } else {
+                    file_open.write_all(b"false");
+                }
+            }
         }
 
         // (true, folder_path)
@@ -126,8 +134,18 @@ fn try_open(fname: &String, td: String) -> (bool, String) {
         };
 
         if created {
-            println!("Writing boilerplate..."); // FIXME boilerplate should be based on struct
-            let _ = file_open.write_all(b"task1,task2,task3,task4\nfalse,false,false,false");
+            println!("Writing boilerplate..."); // FIXME bp based on struct
+            file_open.write_all(c.tasks.join(",").as_bytes()).expect("Cannot write to file");
+            file_open.write_all(b"\n");
+            let mut iter = c.tasks.iter().peekable();
+
+            while let Some(element) = iter.next() {
+                if !iter.peek().is_none() {
+                    file_open.write_all(b"false,");
+                } else {
+                    file_open.write_all(b"false");
+                }
+            }
         }
 
         // (true, folder_path)
@@ -147,6 +165,10 @@ fn try_open(fname: &String, td: String) -> (bool, String) {
             ]
         ), // FIXME: will need to be refactored for customization (so not hardcoded tasks). probably through a config.txt. But that's for later. lamo
     };
+
+    for (task, val) in &df.checklist {
+        println!("!! DEBUG !! {task} : {val}");
+    }
     
     return (true, folder_path)
 }
@@ -158,16 +180,11 @@ fn main() {
 
     let mut file_name = String::new();
     io::stdin().read_line(&mut file_name).expect("Failed to read file name");
-    let pair = try_open(&file_name, today);
+    let pair = try_open(&file_name, today, conf);
 
     if pair.0 {
         // println!("File exists");
         let contents = fs::read_to_string(&pair.1).expect("Should read"); // FIXME read from struct
-                                                                          // for better printing
-                                                                          // that wont make yo
-                                                                          // uwanna
-                                                                          // blelopyeroityoihsdfjkfm
-                                                                          // sdklfg,n jk
         println!("{}", contents);
     }
 
