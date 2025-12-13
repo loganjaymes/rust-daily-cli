@@ -1,7 +1,6 @@
 use std::collections::HashMap;
 use std::fs;
-use std::io;
-use std::io::prelude::*;
+use std::io::{self, prelude::*}
 use chrono::{Local};
 
 // TODO refactor into lib crate cause ts butters
