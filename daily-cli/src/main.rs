@@ -37,7 +37,7 @@ fn load_config() -> Config {
             file
         }
         // FIXME will just break if config not present. will write to newly created config file but throws exception after
-        // not sure if its a permissions thing or logic error in code
+        // not sure if its a permissions thing OS-wise or logic error in code
         Err(error) if error.kind() == io::ErrorKind::NotFound => {
             println!("Config file undetected, creating default...");
             created = true;
@@ -65,6 +65,8 @@ fn load_config() -> Config {
     c
 }
 
+// TODO (maybe) refactoring: change return type to something other than a tuple for better understading
+// when read (ie. "what is the bool for"). maybe Option? not sure 
 fn try_open(fname: &String, td: String, c: Config) -> (bool, String) {
     // TODO: make file struct that is just filled from here
     // TODO: MIGHT NEED TO USE OPENOPTIONS LMFAOOOOOOOOOOOO ggbruh
