@@ -59,11 +59,12 @@ fn load_file() /* -> Result<Config, io::Error > */{
             let mut input = String::new();
             io::stdin().read_line(&mut input);
             let clean_input = input.trim().to_string();
-            file.write_all(clean_input.clone().as_bytes()).expect("Failed to write to new file.");
+            let formatted_input = format!("date,{}", clean_input);
+            file.write_all(formatted_input.clone().as_bytes()).expect("Failed to write to new file.");
             file.write_all(b"\n");
 
             // count num commas => repeat that many times + 1 for false,false,false,false
-            let mut tasks = clean_input.split(",").peekable();
+            let mut tasks = formatted_input.split(",").peekable();
             while let Some(t) = tasks.next() {
                 if !tasks.peek().is_none() {
                     file.write_all(b"false,");
@@ -84,7 +85,11 @@ fn load_file() /* -> Result<Config, io::Error > */{
             // test: actually read file make sure it works and shit
             let content = fs::read_to_string(opened_file).expect("File read unsucc.");
             println!("{content}");
-
+/*
+            Config {
+                
+            }
+*/
         }
     };
 }
