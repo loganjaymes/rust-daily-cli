@@ -83,7 +83,7 @@ fn load_file(today: String) /* -> Result<Config, io::Error > */{
             let content = fs::read_to_string(opened_file).expect("File read unsucc.");
             println!("{content}");
 
-            /* Config {
+            /* LGFile { // only need most recent (so last) line
 
             }*/
         }
