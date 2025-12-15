@@ -44,33 +44,34 @@ fn load_file() /* -> Result<Config, io::Error > */{
     let new = String::from("new");
     match input.trim() {
         new => {
-            println!("What would you like to name the file? DO NOT ADD ANY EXTENSIONS!");
+            println!("What would you like to name the file? DO NOT ADD ANY EXTENSIONS");
             let mut input = String::new();
             io::stdin().read_line(&mut input);
-            let mut new_file = format!("./days/{}.lg", input.trim());
 
-            let file = fs::OpenOptions::new()
+            let mut new_file = format!("./days/{}.lg", input.trim());
+            let mut file = fs::File::options()
             .read(true)
             .write(true)
             .create(true)
-            .open(new_file);
+            .open(new_file).expect("Failed to create new file.");
+
+            println!("What tasks would you like to add? (FORMAT: task1,task2,task3,...,taskn)");
+            let mut input = String::new();
+            io::stdin().read_line(&mut input);
+            let clean_input = input.trim().to_string();
+            file.write(clean_input.as_bytes()).expect("Failed to write to new file.");
         },
         _ => {
             let mut opened_file = format!("./days/{}.lg", input.trim());
-            let file = fs::OpenOptions::new()
+            let mut file = fs::File::options()
             .read(true)
             .write(true)
             .create(true)
-            .open(input);
+            .open(input).expect("Failed to open file.");
         }
     };
-    // fs::read_to_string(path);
 }
-/*
-fn try_open(fname: &String, td: String, c: Config) -> Result<io::Error, String> {
 
-}
-*/
 fn main() {
     let today = start_up();
     load_file();
