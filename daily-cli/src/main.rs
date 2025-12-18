@@ -109,31 +109,31 @@ fn parse_csv(path: String) -> Vec<LGDay> { // essentially whole csv
     }
     // TODO split into parse_csv and create_lgday?
 
-    let stored_days: Vec<LGDay> = Vec::new();
+    let mut stored_days: Vec<LGDay> = Vec::new();
     for record in reader.records() {
         let uw_record = record.unwrap();
-        let record_vals: Vec<String> = uw_record.iter().skip(1).map(|s| String::from(s)).collect();
+        let record_vals: Vec<String> = uw_record.iter().map(|s| String::from(s)).collect();
+        let record_date = record_vals[0].clone(); // annoying but we live
         // above converts StringRecord to String
-        
+
         let mut tasks: HashMap<String, String> = header_vals.clone().into_iter().zip(record_vals.into_iter()).collect(); // each day has own checklist
 
-        println!("TASKMAP IS : {:?}", tasks);
+        // println!("TASKMAP IS : {:?}", tasks);
 
-        // let str_to_bool = matches!(condition, "true"); // use htis for after you fucjdskjfds
-        // ngkjfngkjndskjn DIE
+        // annoying: r_vs technically a bool since we are skipping date but because of CSV, unless
+        // i want to remove date before converting both, it has to be a string
+        // let str_to_bool = matches!(condition, "true");
 
-        // TODO:
-        // put into hmap, send date and hmap to struct
-        // -> store struct in stored_days by date (["20251214", "20251215", ...]).. or something
-        // -> have user edit checklist (hmap) based on date
-        // -> ie. load file -> "wat day woul you like to edit? (YYYYMMDD)"
-        // -> search for day with that date
-        // -> list tasks, ask which one to change (so T->F or F->T (literally just set it to not if
-        // thats possible in rust))
-        // cont til quit
-        
-        // let day = LGDay;
-        // stored_days.push(day) after each creation of lgday
+        // feature not a bug: allows for 'halfway' state
+        // in that case i should make it an enum but i also am going to Durk My Snurk! if i have to
+        // refactor this tonight
+        let day = LGDay {
+            date: record_date.to_string(),
+            checklist: tasks,
+        };
+        println!("{}", &day.date);
+
+        stored_days.push(day); // after each creation of lgday
     }
     stored_days
 }
