@@ -202,8 +202,6 @@ fn run(days: Vec<LGDay>, path: String) {
 
     println!("Value of checklist after changing: {:?}", stored_day.checklist);
 
-    let mut writer = Writer::from_path(path);
-
     /* current structure
      * date
      * {t1 : i,
@@ -217,6 +215,7 @@ fn run(days: Vec<LGDay>, path: String) {
      * write "'date',cl.keys"
      * write "date,cl.vals"
      */
+    
     let mut new_header: Vec<String> = Vec::new();
     new_header.push(String::from("date"));
     let header_to_vec: Vec<String> = stored_day.checklist.keys().cloned().collect();
@@ -224,6 +223,7 @@ fn run(days: Vec<LGDay>, path: String) {
     // dont need to convert from vector ["date", "t1", ..., "tn"] since csv hadnles it
     println!("new header is {:?}", new_header);
     /*
+    let mut writer = Writer::from_path(path);
     writer.write_record(&["date", keys]);
     for d in days {
         let vals = stored_day.checklist.values().cloned().collect();
