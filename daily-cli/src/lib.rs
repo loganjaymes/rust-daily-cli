@@ -7,7 +7,7 @@ pub struct LGDay {
 }
 
 impl LGDay {
-    pub fn build(d: &String, cl: HashMap<String, String>) -> LGDay { // might need to put as Result<>
+    pub fn build(d: &String, mut cl: HashMap<String, String>) -> LGDay { // might need to put as Result<>
         let date = d.to_string();
         let checklist = cl;
 

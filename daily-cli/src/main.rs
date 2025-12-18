@@ -140,7 +140,7 @@ fn parse_csv(path: String) -> Vec<LGDay> { // essentially whole csv as a vector 
 fn run(days: Vec<LGDay>) {
     // start small: edit one date and one task at a time
     let mut stored_day = LGDay { date: String::from(""), checklist: HashMap::new()}; // FIXME make def vals in struct
-    
+    // TODO put in lib.rs? i think
     println!("What date would you like to edit?");
     let mut input = String::new();
     io::stdin().read_line(&mut input);
@@ -173,7 +173,14 @@ fn run(days: Vec<LGDay>) {
         panic!("Could not find task {}", clean_input);
     }
 
-    println!("What value would you like to set it to? (complete, incomplete, in-progress)")
+    println!("What value would you like to set it to? (complete, incomplete, in-progress)");
+    let mut input = String::new();
+    io::stdin().read_line(&mut input);
+    let clean_input = input.trim().to_string();
+    
+    *stored_day.checklist.get_mut(&stored_task).unwrap() = clean_input;
+
+    println!("Value of checklist after changing: {:?}", stored_day.checklist);
 
     /*
      * logic:
