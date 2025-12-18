@@ -102,26 +102,27 @@ fn parse_csv(path: String) -> Vec<LGDay> { // essentially whole csv
     // read header since amt can change
     let headers = reader.headers().unwrap();
     // println!("{:?}", headers);
-    let mut v = Vec::new();
+    let mut header_vals: Vec<String> = Vec::new();
     
     for h in headers.into_iter() {
-        v.push(String::from(h));
+        header_vals.push(String::from(h));
     }
     // TODO split into parse_csv and create_lgday?
 
-    // println!("DBG: {:?}", v);
-    // println!("DBG: v @ i_0 is {}", v.get(0).unwrap());
     let stored_days: Vec<LGDay> = Vec::new();
     for record in reader.records() {
-        let temp = record.unwrap();
-        println!("Date: {}", temp.get(0).unwrap());
-        println!("{}: {}", v.get(1).unwrap(), temp.get(1).unwrap());
-        println!("{}: {}", v.get(2).unwrap(), temp.get(2).unwrap());
-        println!("{}: {}", v.get(3).unwrap(), temp.get(3).unwrap());
-        println!("{}: {}", v.get(4).unwrap(), temp.get(4).unwrap());
+        let uw_record = record.unwrap();
+        let record_vals: Vec<String> = uw_record.iter().map(|s| String::from(s)).collect();
+        // above converts StringRecord to String
+        
+        let mut tasks: HashMap<String, String> = header_vals.clone().into_iter().zip(record_vals.into_iter()).collect(); // each day has own checklist
+
+        println!("TASKMAP IS : {:?}", tasks);
+
+        // let str_to_bool = matches!(condition, "true"); // use htis for after you fucjdskjfds
+        // ngkjfngkjndskjn DIE
 
         // TODO:
-        // make above dynamic (we wont know how many are in records, might be able to do something w len of records? not too sure as of rn)
         // put into hmap, send date and hmap to struct
         // -> store struct in stored_days by date (["20251214", "20251215", ...]).. or something
         // -> have user edit checklist (hmap) based on date
