@@ -104,7 +104,7 @@ fn parse_csv(path: String) -> Vec<LGDay> { // essentially whole csv
     // println!("{:?}", headers);
     let mut header_vals: Vec<String> = Vec::new();
     
-    for h in headers.into_iter() {
+    for h in headers.into_iter().skip(1) {
         header_vals.push(String::from(h));
     }
     // TODO split into parse_csv and create_lgday?
@@ -112,7 +112,7 @@ fn parse_csv(path: String) -> Vec<LGDay> { // essentially whole csv
     let stored_days: Vec<LGDay> = Vec::new();
     for record in reader.records() {
         let uw_record = record.unwrap();
-        let record_vals: Vec<String> = uw_record.iter().map(|s| String::from(s)).collect();
+        let record_vals: Vec<String> = uw_record.iter().skip(1).map(|s| String::from(s)).collect();
         // above converts StringRecord to String
         
         let mut tasks: HashMap<String, String> = header_vals.clone().into_iter().zip(record_vals.into_iter()).collect(); // each day has own checklist
