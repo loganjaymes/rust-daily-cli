@@ -253,8 +253,6 @@ fn run(mut days: Vec<LGDay>, path: String) {
     // edit date => edit task -> edit another task || edit another date
 }
 
-// fn write_csv()
-
 fn main() {
     let today = start_up();
     let file_path = init_file(&today);
