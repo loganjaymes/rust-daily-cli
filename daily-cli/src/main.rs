@@ -5,7 +5,7 @@ use std::ffi::OsStr;
 use std::fs;
 use std::io::{self, prelude::*};
 use chrono::{Local};
-use csv::{Writer, ReaderBuilder, StringRecord};
+use csv::{WriterBuilder, ReaderBuilder, StringRecord};
 use dailycli::{LGDay, edit_date};
 
 fn start_up() -> String {
@@ -21,7 +21,7 @@ fn start_up() -> String {
     today.to_string()
 }
 
-fn init_file(today: String) -> String { // FIXME change to Result<String, &'static str>
+fn init_file(today: &String) -> String { // FIXME change to Result<String, &'static str>
     println!("Locating files...");
 
     let paths = fs::read_dir("./days").unwrap();
@@ -90,7 +90,7 @@ fn init_file(today: String) -> String { // FIXME change to Result<String, &'stat
     // return String::from("Something went wrong :sob:");
 }
 
-fn parse_csv(path: String) -> Vec<LGDay> { // essentially whole csv as a vector w/ DS
+fn parse_csv(path: &String, today: &String) -> Vec<LGDay> { // essentially whole csv as a vector w/ DS
     let mut builder = ReaderBuilder::new();
     builder.double_quote(false);
     let res = builder.from_path(path);
@@ -111,18 +111,34 @@ fn parse_csv(path: String) -> Vec<LGDay> { // essentially whole csv as a vector 
     }
 
     let mut stored_days: Vec<LGDay> = Vec::new();
+    let mut today_found = false; // TODO this is a naive approach im p sure
     for record in reader.records() {
         let uw_record = record.unwrap();
         let record_vals: Vec<String> = uw_record.iter().map(|s| String::from(s)).collect();
-        let record_date = record_vals[0].clone(); // annoying but we live
         // above converts StringRecord to String
+        let record_date = record_vals[0].clone(); // annoying but we live
+        if &record_date == today {
+            today_found = true;
+        }
 
         let mut tasks: HashMap<String, String> = header_vals.clone().into_iter().zip(record_vals.into_iter().skip(1)).collect(); // each day has own checklist
 
         let day = LGDay {
-            date: record_date.to_string(),
+            date: record_date,
             checklist: tasks,
         };
+
+        // automatically append today if not found in file
+        /*
+        if today_found == false {
+            let mut tasks: HashMap<String, String> = header_vals.clone().into_iter().zip(record_vals.into_iter().skip(1)).collect(); 
+
+            let day = LGDay {
+                date: record_date,
+                checklist: tasks,
+            };
+        }
+        */
 
         stored_days.push(day); // after each creation of lgday
     }
@@ -133,6 +149,17 @@ fn run(days: Vec<LGDay>, path: String) {
     // TODO have editing a date and editing the tasks separate funcs in lib.rs
     // implementing it this way likely makes looping for input a lot easier.
     let mut stored_day = LGDay { date: String::from(""), checklist: HashMap::new()}; // FIXME make def vals in struct
+    
+    // check if today is in vector, if not then append
+    // probably better way of doing this, ie. lets say user doesnt want to add new entry, then
+    // this wouldn't be the best solution, but idk as of now
+    
+    println!("For file {}, days include:", &path);
+    
+    for day in &days {
+        println!("{}", day.date);
+    }
+
     println!("What date would you like to edit?");
     let mut input = String::new();
     io::stdin().read_line(&mut input);
@@ -143,6 +170,9 @@ fn run(days: Vec<LGDay>, path: String) {
             stored_day = day;
         } 
     }
+
+    // check if today in vector, if not then auto add it
+
     
     let scuffed_error = stored_day.date.to_string(); // FIXME figure out a better way to handle
                                                      // this lmfao
@@ -174,8 +204,8 @@ fn run(days: Vec<LGDay>, path: String) {
 
     println!("Value of checklist after changing: {:?}", stored_day.checklist);
 
-    let mut writer = WriterBuilder:from_path(path)?;
-    writer.
+    // let mut writer = WriterBuilder::from_path(path)?;
+    // writer.
 
     /*
      * logic:
@@ -201,9 +231,9 @@ fn run(days: Vec<LGDay>, path: String) {
 
 fn main() {
     let today = start_up();
-    let file_path = init_file(today);
+    let file_path = init_file(&today);
     // println!("{file_path}");
-    let days = parse_csv(&file_path);
+    let days = parse_csv(&file_path, &today);
     // implement view after selecting date
-    run(days, &file_path);
+    run(days, file_path);
 }
