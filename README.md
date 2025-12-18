@@ -9,7 +9,7 @@ CLI apps are a common type of lab I've done while in my university's earlier cou
 What I thought would be a small one or two day project has taken me longer than I expected. I underestimated how strict Rust's compiler *actually* is, as well as how verbose the syntax is (although this is for good reason as laid out in The Book).
 I actually redid the entirety of the project from scratch because of how convoluted my first implementation was. </br>
 I will say though, developing this mini-project has made me think about a lot of things that I had never considered while programming in Python or C++ (such as design choices revolving around typing, scopes, etc.). My main takeaway so far is that borrowing and ownership are concepts that are *really* important in Rust. </br>
-With that being said, all functio
+With that being said, all functionality it complete as of 2025/12/18, with minor refactoring and one bug-fix being necessary.
 
 # Features
 - `Reading` and `Writing` using the `CSV crate`
