@@ -1,6 +1,7 @@
 use std::collections::HashMap;
 
 // #[derive(serde::Deserialize, Debug)]
+#[derive(Clone)]
 pub struct LGDay {
     pub date: String,
     pub checklist: HashMap<String, String>,

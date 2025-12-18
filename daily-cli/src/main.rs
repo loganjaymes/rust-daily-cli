@@ -72,9 +72,7 @@ fn init_file(today: &String) -> String { // FIXME change to Result<String, &'sta
             
         },
         _ => {
-            // FIXME might be able to just get rid of all this since were using a dedicated reader
-            // & we assume the file exists.
-            // idk yet
+            // although using reader crate, if the file is empty/DNE we need to initialize it
             let mut opened_file = format!("./days/{}.lg", input.trim());
             let mut file = fs::File::options()
             .read(true)
@@ -86,8 +84,6 @@ fn init_file(today: &String) -> String { // FIXME change to Result<String, &'sta
             
         }
     };
-
-    // return String::from("Something went wrong :sob:");
 }
 
 fn parse_csv(path: &String, today: &String) -> Vec<LGDay> { // essentially whole csv as a vector w/ DS
@@ -101,12 +97,11 @@ fn parse_csv(path: &String, today: &String) -> Vec<LGDay> { // essentially whole
     }
     
     let mut reader = res.unwrap();
-    // read header since amt can change
+    // read header since amt of tasks can change depending on file
     let headers = reader.headers().unwrap();
-    // println!("{:?}", headers);
     let mut header_vals: Vec<String> = Vec::new();
     
-    for h in headers.into_iter().skip(1) {
+    for h in headers.iter().skip(1) {
         header_vals.push(String::from(h));
     }
 
@@ -116,8 +111,9 @@ fn parse_csv(path: &String, today: &String) -> Vec<LGDay> { // essentially whole
         let uw_record = record.unwrap();
         let record_vals: Vec<String> = uw_record.iter().map(|s| String::from(s)).collect();
         // above converts StringRecord to String
-        let record_date = record_vals[0].clone(); // annoying but we live
-        if &record_date == today {
+        let record_date = record_vals[0].clone(); // shouldnt be moving since were skipping 1st index
+                                               // in tasks definition, but rust says it's a borrow
+        if record_date == *today { // if true here we can skip code outside of scope
             today_found = true;
         }
 
@@ -128,19 +124,42 @@ fn parse_csv(path: &String, today: &String) -> Vec<LGDay> { // essentially whole
             checklist: tasks,
         };
 
-        // automatically append today if not found in file
-        /*
-        if today_found == false {
-            let mut tasks: HashMap<String, String> = header_vals.clone().into_iter().zip(record_vals.into_iter().skip(1)).collect(); 
+        stored_days.push(day); // after each creation of lgday
+    }
 
-            let day = LGDay {
-                date: record_date,
-                checklist: tasks,
-            };
+    if today_found == false {
+        // FIXME, might be a better way of doing this
+        // the issue is that, since i want to avoid iterating over every record again,
+
+        // best solution? find a way to do it in the previous loop, but since we are creating the
+        // vector as we iterate, checking for the date before it even has the chance to be
+        // initialized is an issue.
+        /*
+        let curr = stored_days.last().clone();
+        curr.unwrap().date = today.to_string();
+        for val in curr.unwrap().checklist.values_mut() {
+            *val = String::from("incomplete");
         }
+        today_found = true; // should consume but just in case
+        stored_days.push(curr.unwrap().clone());
         */
 
-        stored_days.push(day); // after each creation of lgday
+
+        // im a fucking retard
+        let mut record_vals: Vec<String> = Vec::new();
+        for h in header_vals.iter().skip(1) {
+            record_vals.push(String::from("incomplete"));
+        }
+
+        let mut tasks: HashMap<String, String> = header_vals.clone().into_iter().zip(record_vals.into_iter().skip(1)).collect(); // each day has own checklist
+
+        let day = LGDay {
+            date: today.to_string(),
+            checklist: tasks,
+        };
+
+        stored_days.push(day);
+
     }
     stored_days
 }
