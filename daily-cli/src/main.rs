@@ -233,21 +233,6 @@ fn run(mut days: Vec<LGDay>, path: String) {
         writer.write_record(&new_record);
     }
 
-    /*
-     * logic:
-     * update hmap val for stored_task      DONE
-     * iterate over days and rewrite all    HELP
-     *
-     *                                      write header
-     *                                      for day in lgday
-     *                                          write day1.date, checklist.vals
-     *
-     * ???                                  ????
-     * profit                               PLEASE
-     * done                                 ALSO PLEASE
-     */
-
-
     // TODO have loop cont taking user input
     // if input !"quit" => call edit_date
     // edit date => edit task -> edit another task || edit another date
